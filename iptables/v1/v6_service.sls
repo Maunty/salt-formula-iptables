@@ -1,6 +1,6 @@
 {% from "iptables/map.jinja" import defaults,schema,service with context %}
 
-  {%- if service.v6.enabled %}
+  {% if service.v6.enabled %}
 
 iptables_packages_v6:
   pkg.installed:
@@ -33,14 +33,50 @@ iptables_services_v6_start:
     - file: {{ service.v6.persistent_config }}
     - kmod: iptables_modules_v6_load
 
-    {%- endif %}
+    {% endif %}
+    {% if grains['os'] == 'SUSE' %}
+
+/usr/lib/systemd/system/iptables.service:
+  file.managed:
+  - user: root
+  - group: root
+  - mode: 644
+  - source: salt://iptables/v{{ schema.epoch }}/files/Suse/{{ service.v6.service }}.service
+  - template: jinja
+  - require:
+    - pkg: iptables_packages_v6
+
+
+/usr/lib/iptables/functions:
+  file.managed:
+  - user: root
+  - group: root
+  - mode: 644
+  - source: salt://iptables/v{{ schema.epoch }}/files/Suse/functions
+  - require:
+    - pkg: iptables_packages_v6
+
+/usr/lib/iptables/iptables.init:
+  file.managed:
+  - user: root
+  - group: root
+  - makedirs: True
+  - mode: 755
+  - source: salt://iptables/v{{ schema.epoch }}/files/Suse/{{ service.v6.service }}.init
+  - template: jinja
+  - require:
+    - pkg: iptables_packages_v6
+
+    {% endif %}
 
 {{ service.v6.service }}:
   service.running:
   - enable: true
   - require:
     - file: {{ service.v6.persistent_config }}
+{% if service.v6.modules is defined %}
     - kmod: iptables_modules_v6_load
+{% endif %} 
   - watch:
     - file: {{ service.v6.persistent_config }}
 
@@ -53,7 +89,7 @@ iptables_tables_cleanup_v6:
     - file: {{ service.v6.persistent_config }}
   - watch:
     - file: {{ service.v6.persistent_config }}
-  {%- else %}
+  {% else %}
 
     {% if grains['os'] == 'Ubuntu' %}
 
@@ -74,6 +110,6 @@ iptables_tables_flush_v6:
   - watch:
     - file: {{ service.v6.persistent_config }}
 
-    {%- endif %}
+    {% endif %}
 
-{%- endif %}
+{% endif %}

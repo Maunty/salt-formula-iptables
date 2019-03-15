@@ -1,4 +1,25 @@
 =====================
+about this fork
+=====================
+
+Opensuse support added.
+Service scripts and systemd service files used from RHEL with some minor modifications.
+
+Yes i was too lazy to make my own scripts.
+Use on your own risc. 
+
+Salt master config recommendation
+
+.. code-block:: yaml
+
+  jinja_env:
+    trim_blocks: True
+    lstrip_blocks: True
+  jinja_sls_env:
+    trim_blocks: True
+    lstrip_blocks: True
+
+=====================
 iptables salt formula
 =====================
 

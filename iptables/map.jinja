@@ -36,6 +36,22 @@
             'modules': [ 'ip6table_filter', 'ip6_tables' ],
         },
     },
+    'Suse': {
+        'v4': {
+            'enabled': true,
+            'persistent_config': '/etc/sysconfig/iptables',
+            'pkgs': ['iptables' ],
+            'service': 'iptables',
+            'modules': [],
+        },
+        'v6': {
+            'enabled': true,
+            'persistent_config': '/etc/sysconfig/ip6tables',
+            'pkgs': [ 'iptables' ],
+            'service': 'ip6tables',
+            'modules': [],
+        },
+    },
 }, grain='os_family', merge=salt['pillar.get']('iptables:service')) %}
 
 {% set defaults = salt['grains.filter_by']({
